@@ -1,0 +1,318 @@
+@using Web.Globenetix.Core.Extensions
+@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@{
+	var rawUrl = Html.ViewContext.HttpContext.Request.RawUrl;
+
+	var miniNavKey = "global-mini-nav-data-field";
+	var miniNavData = SiteHelper.Control.PageControlDataField(Model.EditablePageControlDataFields, miniNavKey, miniNavKey);
+	if (miniNavData == null)
+	{
+		throw new Web.Globenetix.Core.Exceptions.PageControlDataFieldNullException(miniNavKey, miniNavKey);
+	}
+
+	var miniMenuItemsDataValue = SiteHelper.Control.DataFieldAsDynamic(miniNavData.Value);
+	var menuMenuItemsJsonValue = Newtonsoft.Json.JsonConvert.SerializeObject(miniMenuItemsDataValue);
+	@* this options varible should be unique for each component, if we use same name in 2 or more it'll throw error *@
+	var miniMenuItemsOptions = new AjaxOptions
+	{
+		HttpMethod = "Post",
+		AllowCache = false,
+		OnBegin = "OnMiniMenuItemsBegin",
+		OnComplete = "OnMiniMenuItemsComplete",
+		OnFailure = "OnMiniMenuItemsFailure",
+		OnSuccess = "OnMiniMenuItemsSuccess"
+	};
+}
+
+
+@{
+Html.BeginScriptContext();
+Html.AddScriptFile("~/Scripts/jquery.unobtrusive-ajax.min.js");
+Html.AddScriptBlock(@<text>
+
+    <script type="text/javascript">
+        function menuMiniViewModel(data) {
+            var self = this;
+            self.miniItems = ko.observableArray([]);
+            $(data).each(function (index, miniNavItem) {
+                var menuItem = new menuMiniItemModelClass(miniNavItem);
+                $(miniNavItem.menuItems).each(function (index, subMenuItem) {
+                    menuItem.menuItems.push(new menuMiniItemModelClass(subMenuItem));
+                });
+                self.miniItems.push(menuItem);
+            });
+          
+          	
+           self.miniItemAdd = function() {
+            var menuId =self.miniItems().length ;
+             if ( menuId> 5) {
+                toastr.info('Only 5 links can be added to the utility navigation menu.', 'Maximum Links Reached.');
+               // toastr.info("Maximum Menus Limit Reached.");
+                return false;
+             }
+            else{
+                menuId=menuId+1;
+                self.miniItems.push(new menuMiniItemModelClass({
+                id: menuId,
+                name: "New Item",
+                title: "",
+                href: "#",
+                hidden: false,
+                editName: true,
+                editLink: true,
+              	isMenuItemEditable: true,
+                sort: 0,
+                localization: true,
+                isParent: false,
+                menuItems: [],
+                isRemovable: true,
+                isEditing: false,
+                visibilityFlag: 1
+            }));
+            } 
+            
+        }
+           self.miniItemRemoveNav = function(parent,item) {
+            	self.miniItems.remove(item);
+            	$(".miniEditBtn").removeAttr("disabled");
+                $(".miniSaveBtn").removeAttr("disabled");
+                $(".miniAddBtn").removeAttr("disabled");
+                toastr.info("Please Click on SAVE UTILITY NAV MENU button to save your changes");
+        	}
+            return self;
+        }
+
+        function menuMiniItemModelClass(data) {
+            var self = this;
+            self.id = ko.observable(data.id);
+            self.name = ko.observable(data.name);
+            self.title = ko.observable(data.title);
+            self.href = ko.observable(data.href);
+            self.hidden = ko.observable(data.hidden);
+            self.sort = ko.observable(data.sort);
+            self.localization = ko.observable(data.localization);
+            self.isParent = ko.observable(data.isParent);
+            self.visibilityFlag = ko.observable(data.visibilityFlag);
+            self.isMenuItemEditable = ko.observable(data.isMenuItemEditable);
+            self.isRemovable = ko.observable(data.isRemovable);
+          	self.editName =  (data.editName === undefined) ? ko.observable(true) : ko.observable(data.editName);
+          	self.editLink =  (data.editLink === undefined) ? ko.observable(true) : ko.observable(data.editLink);
+            self.menuItems = ko.observableArray([]);
+            self.isEditing = ko.observable(false);
+            self.isChanged = ko.observable(false);
+            self.dirtyFlag = new ko.observable(false);
+
+            self.hidden.subscribe(function (newvalue) {
+                self.isChanged(true);
+            });
+            self.name.subscribe(function(newvalue) {
+              if(newvalue ==""){
+                $("#done_"+self.id()).removeClass("btn-success");
+                $("#done_"+self.id()).addClass("btn-warning");
+                $("#done_"+self.id()).css("pointer-events", "none");
+                $("#menuMiniItems-Save").css("pointer-events", "none");
+                toastr.clear();
+                toastr["error"]("Some thing went wrong with Main navigation items", "Error");
+              }
+              else{
+                $("#done_"+self.id()).removeClass("btn-warning");
+                $("#done_"+self.id()).addClass("btn-success");
+                $("#done_"+self.id()).css("pointer-events", "auto");
+                $("#menuMiniItems-Save").css("pointer-events", "auto");
+              }
+              /* self.isChanged(true);
+              self.dirtyFlag(true);*/
+            });
+          
+            self.edit = function () {
+                if (self.isEditing()) {
+                    self.isEditing(false);
+                    $(".miniEditBtn").removeAttr("disabled");
+                    $(".miniSaveBtn").removeAttr("disabled");
+                    $(".miniAddBtn").removeAttr("disabled");
+                    toastr.info("Please Click on SAVE UTILITY NAV MENU button to save your changes");
+                } else {
+                    self.isEditing(true);
+                    $(".miniEditBtn").attr("disabled", "disabled");
+  					$(".miniSaveBtn").attr("disabled", "disabled");
+                    $(".miniAddBtn").attr("disabled", "disabled");                  
+                }
+            };
+          
+            return self;
+        }
+
+        var menuMiniModelData = @Html.Raw(Json.Encode(miniMenuItemsDataValue));
+        var menuMiniItemsLocalData =  menuMiniViewModel(menuMiniModelData);
+        ko.applyBindings(menuMiniItemsLocalData, $("#navMiniform")[0]);
+        $("#menuMiniItems-Save").on("click", function (e) {
+            $("#navMiniform").submit();
+        });
+
+      
+       $(function () {
+      $("#navMiniform").on("submit", function (e) {
+        e.preventDefault();
+        $("[name='DefaultKey']", $("#navMiniform")).val("@miniNavKey");
+        $("[name='Key']", $("#navMiniform")).val("@miniNavKey");
+        $("[name='Value']", $("#navMiniform")).val(ko.toJSON(menuMiniItemsLocalData.miniItems()));
+        var dataField = {};
+        $("#navMiniform input[data-dataField]").each(function () {
+          dataField[this.name] = $(this).val();          
+        });        
+        $("[name='DataField']", $("#navMiniform")).val(ko.toJSON(dataField));
+        return true;/* this true will allow to save the data, for testing use false*/
+      });
+    });
+      
+      
+
+      function OnMiniMenuItemsBegin(e) {     
+        toastr["info"]("Data saving started", "Info");
+      }
+      function OnMiniMenuItemsComplete(e) {
+        console.log("OnComplete");
+      }
+      function OnMiniMenuItemsFailure(e) {     
+        toastr.clear();
+        setTimeout(function(){ 
+          toastr["error"]("Error while saving your data", "Error");
+        }, 200);
+      }
+      function OnMiniMenuItemsSuccess(e) {      
+        toastr.clear();
+        setTimeout(function(){ 
+          toastr["success"]("Your data saved successfully", "Success");
+        }, 200);
+      }
+    </script>
+</text>);
+Html.EndScriptContext();
+}
+
+
+
+@helper CreateFormGroupWithInput(string title, IHtmlString input, string helpText = "")
+{
+    <div class="form-group">
+        <label>@title</label>
+        @input
+        <span class="form-text text-muted">@helpText</span>
+    </div>
+}
+
+@using (Ajax.BeginForm(null, null, miniMenuItemsOptions, new { id = "navMiniform", action = rawUrl  , enctype = "multipart/form-data"}))
+{
+<div class="row mt-4">
+<div class="row-flex accent-color col-md-3">
+  <div>
+    <!--<h3><b>Mini Navigation Menus</b></h3>-->
+    <!--<button type="submit" class="btn btn-primary waves-effect waves-light">Save Menu Info</button>     -->
+    <button id="menuMiniItems-Save" name="miniMenuItems-Save" type="button" class="btn btn-primary  miniSaveBtn">Save Utility Nav Menu</button>
+  </div>
+</div>
+<section class="text-center pt-2 pb-5 mb-3 col-md-9">
+  
+   <div class="row manage-navs align-items-center px-3">
+            <div class="col-md-9 accent-color">
+                <h3 class="pull-left font-24">Manage Utility Navigation Menu</h3>
+            </div>
+            <div class="col-md-3">
+                <button class="pull-right col-10 px-3 btn btn-primary miniAddBtn" data-bind="click: $root.miniItemAdd">Add</button><br />
+            </div>
+        </div>
+
+  <div class="tab-content pt-2 col-12">
+    <div data-bind="template: { name: 'menu-mini-template', data:'' }"></div>  
+
+    <div  id="miniTabContent" data-bind="sortable: { data: miniItems }"> 
+      <div data-bind="template: { name: 'mini-menu-item-template', data: $data }"></div>
+    </div>
+  </div>
+</section>
+</div>
+	@Html.AntiForgeryToken()
+<!-- coming this datafield key informaiton from Backend -->
+<input type="hidden" name="Id" data-dataField value="@miniNavData.Id" />
+<input type="hidden" name="IsRequired" data-dataField value="@miniNavData.IsRequired.ToString()" />
+<input type="hidden" name="Key" data-dataField value="@miniNavData.Key" />
+<input type="hidden" name="MaxLength" data-dataField value="@miniNavData.MaxLength" />
+<input type="hidden" name="PageControl_Id" data-dataField value="@miniNavData.PageControl_Id" />
+<input type="hidden" name="LastUpdated" data-dataField value="@miniNavData.LastUpdated" />
+<input type="hidden" name="Value" data-dataField value="" />
+<input type="hidden" name="DefaultKey" value="" />
+<input type="hidden" name="DataField" value="" />
+<input type="hidden" name="controller" value="DataFieldControl" />
+}
+
+
+<script type="text/html" id="menu-mini-template">
+<div class="row my-2 manage-pages accent-color">
+    <div class="col-md-3">
+        <label><h5><b>Manage</b></h5></label>
+  </div>
+    <div class="col-md-3">
+        <label><h5><b>Name</b> <i class="fa fa fa-info-circle name toggletooltip" data-html="true" aria-hidden="true" style="font-size:14px;cursor:pointer;" data-placement="top" data-toggle="tooltip" title="Please enter the name of the page or link that will appear in the navigation menu.<br/>Example: <br/> What To Expect"></i></h5></label>
+  </div>
+    <div class="col-md-3">
+        <label><h5><b>Link</b> <i class="fa fa fa-info-circle link toggletooltip" data-html="true" aria-hidden="true" style="font-size:14px;cursor:pointer; " data-toggle="tooltip" title="Please enter the url of the page you want to link to.<br/> Example:<br/> /what-to-expect"></i></h5></label>
+  </div>
+    <!--<div class="col-md-3">
+        <label><h5><b>Title</b> <i class="fa fa fa-info-circle title toggletooltip" data-html="true" aria-hidden="true" style="font-size:14px;cursor:pointer; " data-toggle="tooltip" title="(Optional): Please enter additional information to clarify or describe this link.<br/> Note: Your visitors will generally not be able to  see this on the site and should be used sparingly. Titles should be limited to 60 characters. <br/> Example: Business Journal press release on Best of orlando Award."></i></h5></label>
+  </div>-->
+    <div class="col-md-3"><label><h5><b>Hide</b></h5></label></div>
+  </div>
+</script>
+
+<script type="text/html" id="mini-menu-item-template">
+    <div class="mouse-drag bg-section bg-section-drag">
+	<div>
+        <div data-bind="visible: !isEditing()">
+            <div class="row py-2 manage-pages align-items-center bg-sec bg-border bg-drag item-break" data-bind="visible: !isEditing()">
+                <div class="col-md-3">
+                    <button class="btn btn-primary col-12 px-3 waves-effect waves-light miniEditBtn" data-bind="click: edit">Edit</button>
+                </div>
+                <div class="col-md-3">
+                    <span data-bind="text: name">Home</span>
+                </div>
+                <div class="col-md-3" data-bind="text: href">/</div>
+                <!--<div class="col-md-3" data-bind="text: title"></div>-->
+                <div class="col-md-3">
+                    <div data-bind="attr:{id:'raw'}" class="switch" style="pointer-events:none;"><label><input type="checkbox" data-bind="checked: hidden"><span class="lever" data-bind="css:{'bg-dark':!hidden,'bg-color':hidden()}"></span></label></div>
+                </div>
+            </div>
+        </div>
+        <div data-bind="visible: isEditing()" style="display: none;">
+            <div class="row align-items-center bg-sec bg-drag bg-border">
+                <!--<div class="form-row">-->
+                    <div class="col-md-3">
+                        <button class="btn btn-success col-12 px-3 waves-effect waves-light" data-bind="attr:{ Id:'done_'+ id()},click: edit">Done</button>
+                        <button class="btn btn-danger col-12 px-3 waves-effect waves-light" data-bind="click: $root.miniItemRemoveNav.bind($parent,$data), visible: isRemovable"> remove </button>
+                    </div>
+                    @{
+                    var miniMenuItemName = SiteHelper.Page.CreateTextInput(Html, "Name", "", new { data_bind = "attr:{ Id:'mininame_'+ id,  name:'mininame_'+name, maxlength:20}, value : name, valueUpdate: 'afterkeyup'", required = "", @class = "form-control" });
+                    var miniMenuItemHref = SiteHelper.Page.CreateTextInput(Html, "Href", "", new { data_bind = "attr:{ Id:'minihref_'+ id,  name:'minihref_'+name}, value : href", required = "", @class = "form-control" });
+                    var miniMenuItemTitle = SiteHelper.Page.CreateTextInput(Html, "Title", "", new { data_bind = "attr:{ Id:'minititle'+ id,  name:'minititle'+name}, value : title",  @class = "form-control" });
+                    }
+                    <div class="col-md-3">
+                        @CreateFormGroupWithInput("", miniMenuItemName, "")
+                    </div>
+                    <div class="col-md-3">
+                        @CreateFormGroupWithInput("", miniMenuItemHref, "")
+                    </div>
+                   <!--<div class="col-md-3">
+                        @CreateFormGroupWithInput("", miniMenuItemTitle, "")
+                    </div>-->
+                    <div class="col-md-3">
+                     <div data-bind="attr:{id:'editable'}" class="switch"><label class="mb-0">Show</label><label class="mb-0"><input type="checkbox" data-bind="checked:hidden"><span class="lever" data-bind="css:{'bg-dark':!hidden,'bg-color':hidden()}"></span></label><label class="mb-0">Hide</label></div>
+                    </div>
+                </div>
+                <!--<div class="col-md-1">
+                </div>-->
+
+           <!-- </div>-->
+        </div>
+		</div>
+    </div>
+</script>

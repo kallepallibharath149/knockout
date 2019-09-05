@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+            var data=[{dirtyFlag: false,
+            editLink: true,
+            editName: true,
+            hidden: true,
+            href: "/own-a-red-effect",
+            id: 3,
+            isChanged: false,
+            isEditing: false,
+            isParent: false,
+            isRemovable: false,
+            localization: false,
+            menuItems: [],
+            name: "Own a Red Effect",
+            sort: 0,
+            title: "",
+            visibilityFlag: 3},
+            
+            {
+                dirtyFlag: false,
+            editLink: true,
+            editName: true,
+            hidden: false,
+            href: "https://redeffectfitness.zenoti.com/webstore/",
+            id: 1,
+            isChanged: false,
+            isEditing: false,
+            isParent: false,
+            isRemovable: false,
+            localization: false,
+            menuItems: [],
+            name: "Schedule Classes",
+            sort: 0,
+            title: "rrrrrr",
+            visibilityFlag: 3
+            },
+            {
+            dirtyFlag: false,
+            editLink: true,
+            editName: true,
+            hidden: false,
+            href: "/careers",
+            id: 2,
+            isChanged: false,
+            isEditing: false,
+            isParent: false,
+            isRemovable: false,
+            localization: false,
+            menuItems: [],
+            name: "Careers",
+            sort: 0,
+            title: "",
+            visibilityFlag: 3  
+            }]
+            
+            </script>
+    <title>Document</title>
+    <style>
+        .row {
+ 
+  
+  overflow: hidden !important;
+  white-space: initial !important;
+}
+    a.nav-link{
+        color:black !important;
+
+    }
+    a.nav-link.active{
+        background:lightblue !important;
+        
+    }
+    </style>
+</head>
+<body style="width:100%">
+    <div id="headerr" class="container-fluid">
+    <div class="">
+        <div class="">
+                <div id="" class="head p-3 text-dark">
+                        <h2> Header & Footer Navigation Menu&nbsp;&nbsp;<span  data-bind="" id="more" class="small">More Info</span><i id="more"class="  fa fa fa-info-circle" aria-hidden="true"></i></h2>
+                        <div id="info" >
+                                  Here you can modify the text and links that appear on your website's navigation menu. After you make any changes, click on the save button for each area you have modified.
+                              </div>
+                      </div>
+        </div>
+        
+    </div>
+
+    <div id="navigation" class="" style="background-color: red;color:white;font-weight: 300;">
+            <ul class="nav nav-pills md-tabs bg-color nav-justified">
+                 <li class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#mini-navigationmanage">Header Utility Navigation</a></li>
+                 <li class="nav-item"><a  class="nav-link"  role="tab" data-toggle="tab" href="#header-navigationmanage">Header Main Navigation</a></li>
+                 <li class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#footer-navigationmanage">Footer Navigation</a></li>
+                 <li class="nav-item"><a class="nav-link"  role="tab" data-toggle="tab" href="#siteScripts">Global Site Scripts</a></li>
+               </ul>
+            </div>
+           <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fadeIn active" id="mini-navigationmanage">
+                       
+                        <div class="row">
+                                <div class="col-md-4">
+                                    <button class="mt-3 btn btn-primary">SAVE UTILITY NAV MENU</button>
+                                    
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="container">
+                                            <div class="row">
+                                                    <div class="mt-3 col-md-8 "><b class="h3 float-left">Manage Utility Navigation Menu</b></div>
+                                                    <div class="mt-3 col-md-4">
+                                                        <button data-bind="click:function(){addItem()}"class="btn  btn-danger float-right">ADD</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                      <div class="col-md-12"><div data-bind="template: { name: 'miniitemsheader', data: '' }"></div></div>  
+                                                </div>
+                                                <div class="row">
+                                                       <div class="col-md-12 m-2" data-bind="template:{name:'mini-menu-item-template',foreach: miniitems}" >
+                                                           
+                                                       </div>
+                                                </div>
+
+                                    </div>
+                                    
+                                 
+                                </div>
+                            </div>
+
+            </div>
+               <div role="tabpanel" class="tab-pane fade" id="header-navigationmanage">
+                 data from header main nav need to implement
+               </div>
+               <div role="tabpanel" class="tab-pane fade" id="footer-navigationmanage">
+                  data from footer need to implement
+               </div>
+                 <div role="tabpanel" class="tab-pane fade h-100" id="siteScripts">
+                    site scripts need to iplement
+               </div>
+           </div>
+        </div>
+        <script type="text/html" id="miniitemsheader">
+            <div class="mt-2 row bg-info">
+        <div class="col-md-3 pl-2 pr-0">MANAGE</div>
+        <div class="col-md-3 pl-2 pr-0">NAME</div>
+        <div class="col-md-3 pl-2 pr-0">LINK</div>
+        <div class="col-md-3 pl-2 pr-0">HIDE</div>
+        </div>
+    </div>
+        </script>
+        <script type="text/html" id="mini-menu-item-template">
+        <div class="row mt-2">
+           <div class="col-md-3 pl-0">
+               <button type="button" data-bind="text:'Edit',visible:!isEditing(), click:function(event ,data){$parent.editdata($index,'edit')}" class="btn btn-danger"></button>
+               <button type="button" data-bind="text:'Done',visible:isEditing, click:function(event,data){$parent.editdata($index,'done')}" class="btn  btn-success"></button><br>
+               <span data-bind="visible:$parent.showdelete()?$parent.showdeleteindex()==$index?true:false:false, click:function(event,data){$parent.removeMiniItem($index)}"><button type="button" data-bind="text:'Remove'" class="btn  btn-danger"></button> </span>
+           </div>
+           <div class="col-md-3  pl-0">
+               <span data-bind="text:name , visible:isEditing()?false:true"></span>
+               <input class="items form-control" type="text" data-bind="textInput:name, visible:isEditing"/>
+           </div>
+           <div class="col-md-3  pl-0">
+                <span data-bind="text:href , visible:isEditing()?false:true"></span>
+                <input class="items form-control" type="text" data-bind="textInput:href, visible:isEditing"/>
+           </div>
+           <div class="col-md-3  pl-0">
+            <div  data-bind="attr:{id:'editable'}" class="switch"><label class="mb-0">Show</label><label class="mb-0"><input class="items" type="checkbox" data-bind="checked:hidden"><span class="lever" data-bind="css:{'bg-dark':!hidden,'bg-color':hidden()}"></span></label><label class="mb-0">Hide</label></div>   
+           </div>
+        </div>
+        
+        
+        </script>
+    <script>
+   
+     console.log(data);
+
+     function miniItemsViewModel(){
+         var self=this;
+         self.oneiteminediting=ko.observable(false);
+         self.miniitems=ko.observableArray([]);
+         self.miniItemsLength=ko.observable();
+         self.showdelete=ko.observable(false);
+         self.showdeleteindex=ko.observable();
+         self.removeMiniItem=function(index){
+          self.miniitems().splice(index,1);
+         }
+         self.isNewItem=function(){
+            if(self.oneiteminediting()==true){
+                if(self.currentIndexEditing()>self.miniItemsLength()){
+                    return true;
+                }else
+                {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+               
+         };
+         self.editdata=function(index,data){
+             if(data=='edit'){
+                self.showdelete(true);
+                self.showdeleteindex(index);
+                self.miniitems()[index()].isEditing(true);
+                $(".items").removeAttr('disabled');
+                self.oneiteminediting(true);
+
+             }else if(data=='done'){
+                self.showdelete(false);
+                self.oneiteminediting(false);
+                self.miniitems()[index()].isEditing(false);
+                $(".items").attr('disabled','true');
+             }
+            
+             
+         
+        };
+         self.addItem=function(){
+             var menuId=self.miniitems().length;
+             alert('your current length'+menuId);
+             if(menuId>5){
+                 alert('you can add only 4 items');
+          
+                 
+             }
+             else{
+                menuId=menuId+1;
+                self.miniitems.push(new miniItemsModel({id: menuId,
+                name: "New Item",
+                title: "",
+                href: "#",
+                hidden: false,
+                editName: true,
+                editLink: true,
+              	isMenuItemEditable: true,
+                sort: 0,
+                localization: true,
+                isParent: false,
+                menuItems: [],
+                isRemovable: true,
+                isEditing: false,
+                visibilityFlag: 1}));
+             }
+             alert('your current mini items length'+self.miniitems().length);
+              
+         };
+   
+     }
+
+     function miniItemsModel(data){
+         var self=this;
+        self.id = ko.observable(data.id);
+            self.name = ko.observable(data.name);
+            self.title = ko.observable(data.title);
+            self.href = ko.observable(data.href);
+            self.hidden = ko.observable(data.hidden);
+            self.sort = ko.observable(data.sort);
+            self.localization = ko.observable(data.localization);
+            self.isParent = ko.observable(data.isParent);
+            self.visibilityFlag = ko.observable(data.visibilityFlag);
+            self.isMenuItemEditable = ko.observable(data.isMenuItemEditable);
+            self.isRemovable = ko.observable(data.isRemovable);
+          	self.editName =  (data.editName === undefined) ? ko.observable(true) : ko.observable(data.editName);
+          	self.editLink =  (data.editLink === undefined) ? ko.observable(true) : ko.observable(data.editLink);
+            self.menuItems = ko.observableArray([]);
+            self.isEditing = ko.observable(false);
+            self.isChanged = ko.observable(false);
+            self.dirtyFlag = new ko.observable(false);
+        
+     }
+     var miniviwmodel=new miniItemsViewModel();
+     var length=data.length;
+     miniviwmodel.miniItemsLength(length);
+
+     (function(){
+         
+       $.each(data,function(index, miniitem){
+         var itemobj=new miniItemsModel(miniitem);
+         $.each(miniitem.menuItems,function(index, submenuitem){
+            itemobj.menuItems.push(new miniItemsModel(submenuitem) );
+         });
+         miniviwmodel.miniitems.push(itemobj);
+       });
+      
+     }())
+       
+ko.applyBindings(miniviwmodel,document.getElementById('headerr'))
+    
+    </script>
+   
+   
+</body>
+</html>
